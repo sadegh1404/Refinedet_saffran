@@ -7,12 +7,13 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 from models import RefineDetVGG16
 from utils import read_jpeg_image, resize_image_and_boxes, absolute2relative
-from voc import load_voc_dataset, Augmentation
-from voc.config import IMAGE_SIZE, BATCH_SIZE, SHUFFLE_BUFFER, VOC_CLASSES, LR_SCHEDULE, MOMENTUM, NUM_EPOCHS, STEPS_PER_EPOCH
+from saffran import load_saffran_dataset,Augmentation
+from saffran.config import IMAGE_SIZE, BATCH_SIZE, SHUFFLE_BUFFER, NUM_CLASS, LR_SCHEDULE, MOMENTUM, NUM_EPOCHS, STEPS_PER_EPOCH
+
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--voc_root', type=str, default='./data/VOCdevkit',
+parser.add_argument('--saffran_root', type=str, default='./data/Saffron_Dataset/Labeled/',
                     help='Path to the VOCdevkit directory.')
 parser.add_argument('--checkpoint', type=str, default=None,
                     help='Path to the weights file, in the case of resuming training.')
@@ -66,10 +67,7 @@ def build_dataset(img_paths, bboxes, repeat=False, shuffle=False,
 
 
 
-train_img_paths, train_bboxes = load_voc_dataset(
-    dataroot=args.voc_root,
-    splits=[('VOC2007', 'trainval')],
-    keep_difficult = False, return_difficulty=False)
+train_img_paths, train_bboxes = load_saffran_dataset(dataroot=args.saffran_root)
 print('INFO: Loaded %d training samples' % len(train_img_paths))
 
 # test_img_paths, test_bboxes = load_voc_dataset(

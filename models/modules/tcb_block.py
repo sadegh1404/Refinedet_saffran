@@ -16,7 +16,7 @@ class TCBBlock(tf.keras.Model):
                             padding='same', activation=None,
                             kernel_regularizer=kernel_regularizer)
 
-        self.tconv = Conv2DTranspose(256, kernel_size=2, strides=2,
+        self.tconv = Conv2DTranspose(256, kernel_size=4, strides=2,
                                      padding='same', activation=None,
                                      kernel_regularizer=kernel_regularizer)
 
