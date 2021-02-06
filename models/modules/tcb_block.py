@@ -26,10 +26,7 @@ class TCBBlock(tf.keras.Model):
 
 
     @tf.function
-    def call(self, ftm, next_ftm=None):
-        print(10*'_')
-        print('ftm:',ftm.shape)
-        
+    def call(self, ftm, next_ftm=None):        
         x = self.conv1(ftm)
         x = self.conv2(x)
         

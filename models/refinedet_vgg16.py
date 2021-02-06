@@ -66,11 +66,6 @@ class RefineDetVGG16(RefineDetBase):
         ftm4_3_norm = self.feat4_3_norm(ftm4_3)
         ftm5_3_norm = self.feat5_3_norm(ftm5_3)
         ext = self.extras(ftm7)
-        print(20*'*')
-        print(ftm4_3_norm.shape)
-        print(ftm5_3_norm.shape)
-        print(ext.shape)
-        print(ftm7.shape)
         ftmaps = [ftm4_3_norm, ftm5_3_norm, ftm7, ext]
         
         arm_cls, arm_loc, anchors = [], [], []
