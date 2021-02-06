@@ -27,10 +27,14 @@ class TCBBlock(tf.keras.Model):
 
     @tf.function
     def call(self, ftm, next_ftm=None):
+        print(10*'_')
+        print('ftm:',ftm.shape)
+        
         x = self.conv1(ftm)
         x = self.conv2(x)
-
+        
         if next_ftm is not None:
+            print('next_ftm',next_ftm.shape)
             x += self.tconv(next_ftm)
 
         x = tf.nn.relu(x)

@@ -5,6 +5,7 @@ from tensorflow.keras import backend as K
 @tf.function(experimental_relax_shapes=True)
 def read_jpeg_image(img_path):
     image = tf.io.read_file(img_path)
+    image = tf.image.resize(image,(1024,1024))
     image = tf.image.decode_jpeg(image, channels=3)
     return image
 

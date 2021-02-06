@@ -7,7 +7,9 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 from models import RefineDetVGG16
 from utils import read_jpeg_image, resize_image_and_boxes, absolute2relative
-from saffran import load_saffran_dataset,Augmentation
+from saffran.saffran_data_loader import load_saffran_dataset
+from saffran.augmentations import Augmentation
+
 from saffran.config import IMAGE_SIZE, BATCH_SIZE, SHUFFLE_BUFFER, NUM_CLASS, LR_SCHEDULE, MOMENTUM, NUM_EPOCHS, STEPS_PER_EPOCH
 
 
@@ -86,7 +88,7 @@ print(train_data)
 
 print('INFO: Instantiating model...')
 
-model = RefineDetVGG16(num_classes=len(VOC_CLASSES))
+model = RefineDetVGG16(num_classes=NUM_CLASS)
 model.build(input_shape=(BATCH_SIZE, IMAGE_SIZE[0], IMAGE_SIZE[1], 3))
 
 if args.checkpoint:
@@ -112,5 +114,5 @@ callbacks = [
                     monitor='total_loss')    
 ]
 
-model.fit(train_data, epochs=NUM_EPOCHS, steps_per_epoch=STEPS_PER_EPOCH,
-          initial_epoch=args.initial_epoch, callbacks=callbacks)
+# model.fit(train_data, epochs=NUM_EPOCHS, steps_per_epoch=STEPS_PER_EPOCH,
+#           initial_epoch=args.initial_epoch, callbacks=callbacks)
