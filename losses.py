@@ -11,7 +11,7 @@ def smooth_l1(a, b):
     return tf.where(x < 1, 0.5*x*x, x - 0.5)
 
 
-    class RefineDetLoss(tf.keras.losses.Loss):
+class RefineDetLoss(tf.keras.losses.Loss):
     def __init__(self, num_classes,
                  anchor_refinement_threshold=0.99,
                  neg_to_pos_ratio=3,
