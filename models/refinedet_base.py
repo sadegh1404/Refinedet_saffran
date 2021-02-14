@@ -46,7 +46,7 @@ class RefineDetBase(tf.keras.Model):
                 all_losses[i] for i in range(4)
             ]
             l2_reg_loss = tf.reduce_sum(self.losses)
-            loss = arm_cls_loss + arm_loc_loss + odm_cls_loss + odm_loc_loss + l2_reg_loss
+            loss = arm_cls_loss + arm_loc_loss + odm_cls_loss + odm_loc_loss #+ l2_reg_loss
 
         grad = tape.gradient(loss, self.trainable_variables)
         self.optimizer.apply_gradients(zip(grad, self.trainable_variables))
