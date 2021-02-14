@@ -10,11 +10,11 @@ from .vgg16_reducedfc import VGG16ReducedFC
 
 class RefineDetVGG16(RefineDetBase):
     def __init__(self, num_classes, aspect_ratios=[0.5, 1.0, 2.0],
-                 scales=[0.1, 0.2, 0.4, 0.8], **kwargs):
+                 scales=[0.1, 0.2, 0.4, 0.8],num_scales=4, **kwargs):
         self.num_classes = num_classes
         self.aspect_ratios = aspect_ratios
         self.scales = scales
-        self.num_scales = 4
+        self.num_scales = num_scales
         
         super(RefineDetVGG16, self).__init__(**kwargs)
 
