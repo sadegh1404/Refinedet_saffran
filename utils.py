@@ -44,14 +44,14 @@ def absolute2relative(boxes, size):
 
 
 @tf.function(experimental_relax_shapes=True)
-def minmax2xywh(boxes):
-    xmin, ymin, xmax, ymax = [boxes[..., i] for i in range(4)]
-    cx = (xmin + xmax)*0.5
-    cy = (ymin + ymax)*0.5
-    w = xmax - xmin
-    h = ymax - ymin
-    new_boxes = tf.stack([cx, cy, w, h], axis=-1)
-    return tf.concat([new_boxes, boxes[..., 4:]], axis=-1)
+    def minmax2xywh(boxes):
+        xmin, ymin, xmax, ymax = [boxes[..., i] for i in range(4)]
+        cx = (xmin + xmax)*0.5
+        cy = (ymin + ymax)*0.5
+        w = xmax - xmin
+        h = ymax - ymin
+        new_boxes = tf.stack([cx, cy, w, h], axis=-1)
+        return tf.concat([new_boxes, boxes[..., 4:]], axis=-1)
 
 
 @tf.function(experimental_relax_shapes=True)
