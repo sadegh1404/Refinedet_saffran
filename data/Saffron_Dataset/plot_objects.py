@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 from utils import *
 
-def draw_line_segment(image, center, angle, color, length=20, thickness=2):
+def draw_line_segment(image, center, angle, color, length=40, thickness=2):
     x1 = center[0] - cosd(angle) * length / 2
     x2 = center[0] + cosd(angle) * length / 2
     y1 = center[1] - sind(angle) * length / 2
@@ -11,8 +11,8 @@ def draw_line_segment(image, center, angle, color, length=20, thickness=2):
 
     cv2.line(image, (int(x1 + .5), int(y1 + .5)), (int(x2 + .5), int(y2 + .5)), color, thickness)
 
-image = cv2.imread('Labeled/003.jpg')
-flowers = np.loadtxt('Labeled/003.csv', delimiter=',')
+image = cv2.imread('Labeled/007.jpg')
+flowers = np.loadtxt('Labeled/007.csv', delimiter=',')
 
 draw = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 for i in range(flowers.shape[0]):

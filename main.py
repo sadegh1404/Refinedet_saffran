@@ -72,30 +72,25 @@ def build_dataset(img_paths, bboxes, repeat=False, shuffle=False,
 train_img_paths, train_bboxes = load_saffran_dataset(dataroot=args.saffran_root)
 print('INFO: Loaded %d training samples' % len(train_img_paths))
 
-# test_img_paths, test_bboxes = load_voc_dataset(
-#     dataroot=args.voc_root,
-#     splits=[('VOC2007', 'test')],
-#     keep_difficult = True, return_difficulty=True)
-# print('INFO: Loaded %d testing samples' % len(test_img_paths))
+# Classes starts at 0
+for i in train_bboxes:
+  i[:,-1] = i[:,-1] -1
+
 
 train_data = build_dataset(train_img_paths, train_bboxes,
                            repeat=True, shuffle=True, drop_remainder=True,
                            augmentation_fn=Augmentation())
-# test_data = build_dataset(test_img_paths, test_bboxes,
-                        #   repeat=False, shuffle=False, drop_remainder=False)
 
 print(train_data)
 
 print('INFO: Instantiating model...')
 
-model = RefineDetVGG16(num_classes=NUM_CLASS)
+model = RefineDetVGG16(num_classes=NUM_CLASS,aspect_ratios=[1.0])
 model.build(input_shape=(BATCH_SIZE, IMAGE_SIZE[0], IMAGE_SIZE[1], 3))
 
 if args.checkpoint:
     model.load_weights(args.checkpoint)
 else:
-    # If training from scratch, initialize only the base CNN
-    # with pretrained Imagenet weights
     model.base.load_weights(
         path.join('weights', 'VGG_ILSVRC_16_layers_fc_reduced.h5'), by_name=True)
 
@@ -114,5 +109,64 @@ callbacks = [
                     monitor='total_loss')    
 ]
 
-# model.fit(train_data, epochs=NUM_EPOCHS, steps_per_epoch=STEPS_PER_EPOCH,
-#           initial_epoch=args.initial_epoch, callbacks=callbacks)
+history = model.fit(train_data, epochs=NUM_EPOCHS, steps_per_epoch=STEPS_PER_EPOCH,
+          initial_epoch=args.initial_epoch, callbacks=callbacks)
+
+import cv2 
+import matplotlib.pyplot as plt
+
+def sind(x):
+    return np.sin(x / 180*np.pi)
+    
+def cosd(x):
+    return np.cos(x / 180*np.pi)
+    
+def draw_line_segment(image, center, angle, color, length=40, thickness=3):
+    x1 = center[0] - cosd(angle) * length / 2
+    x2 = center[0] + cosd(angle) * length / 2
+    y1 = center[1] - sind(angle) * length / 2
+    y2 = center[1] + sind(angle) * length / 2
+
+    cv2.line(image, (int(x1 + .5), int(y1 + .5)), (int(x2 + .5), int(y2 + .5)), color, thickness)
+
+def draw_ouput_lines(centers_box,test,print_conf=False,resize=False):
+    out = []
+    if resize:
+        test = cv2.resize(test,resize)
+        SIZE2,SIZE1 = resize
+    else:
+        SIZE1,SIZE2 = 640,640
+    if print_conf:
+        print(centers_box[:,-1])
+    for i in centers_box:
+        cx = i[0] * SIZE2
+        cy = i[1] * SIZE1 
+        label = i[-2]
+        confidence = i[-1]
+        angle = np.arccos(label/NUM_CLASS)*(180/np.pi)
+        draw_line_segment(test,(cx,cy),angle,(255,255,0))
+        out.append('{} {} {} {}'.format(str(cx),str(cy),str(angle),str(confidence)))
+    plt.figure(figsize=(10,10))
+    plt.imshow(test)
+    plt.show()
+    return out
+
+SIZE=640
+test_dir = 'data/Saffron_Dataset/Test/' # CHANGE HERE TO CHANGE TEST DIRECTORY 
+test_images = os.listdir(test_dir)
+for img_name in test_images:
+    if img_name.endswith('.txt'):
+        continue
+    img = cv2.imread(test_dir+img_name)
+    img = img.astype(np.float64)
+    org_shape = img.shape
+    img = cv2.resize(img,(SIZE,SIZE))
+    img = np.expand_dims(img,0)
+    out_boxes = model(img,decode=True)
+    nms_box = NMS(out_boxes[0],top_k=500,nms_threshold=0.1)
+    centers_box = minmax2xywh(nms_box)
+
+    out = draw_ouput_lines(centers_box,img[0].astype(np.uint8),False,resize=org_shape[:2][::-1])
+    out = '\n'.join(out)
+    with open(test_dir + img_name.split('.')[0]+'.txt','w') as f:
+        f.write(out)
